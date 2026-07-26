@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: "AvertaStd";
+  src: url("./font/Averta-Standard-Font/AvertaStd-Black.ttf") format("ttf");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* Providus Unity brand theme (Tailwind v4 CSS-based config) */
+@theme {
+  --font-sans: 'AvertaStd', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #242424;
+  --color-ink-900: #1c282e;
+  --color-ink-700: #26343b;
+  --color-ink-500: #4a5a62;
+
+  --color-gold: #f0a500;
+  --color-gold-light: #ffc341;
+  --color-gold-dark: #e08a00;
+
+  --shadow-phone: 0 24px 60px -20px rgb(38 52 59 / 0.35);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide the up/down spinner arrows on number inputs */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
