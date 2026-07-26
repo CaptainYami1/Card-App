@@ -23,17 +23,14 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
   const [getAccountName, { isLoading }] = useGetAccountNameMutation();
 
   const isComplete = accountNumber.length === 10;
-
   const canContinue = isComplete && !!accountName && !isLoading;
 
   function handleChange(value: string) {
-    // Account numbers are digits only, max 10 (NUBAN).
     setAccountNumber(value.replace(/\D/g, "").slice(0, 10));
     setAccountName("");
     setErrorMsg("");
   }
 
-  // // Resolve the account name as soon as a full 10-digit NUBAN is entered.
   useEffect(() => {
     if (accountNumber.length !== 10) return;
 
@@ -49,6 +46,9 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
 
         const name =
           res.accountName ??
+          res.name ??
+          res.data?.accountName ??
+          res.data?.name ??
           "";
 
         if (name) {
@@ -57,7 +57,7 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
         } else {
           setErrorMsg("Invalid account number. Please check and try again.");
         }
-      } catch {
+      } catch  {
         if (!active) return;
         setErrorMsg("Invalid account number. Please check and try again.");
       }
@@ -73,13 +73,11 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
     if (!canContinue) return;
     onContinue({ accountNumber, accountName });
   }
-
-  
   return (
     <>
       <div className="flex flex-1 flex-col px-6 pb-6">
-        <div className="flex-1 flex-col justify-center items-center h-full place-content-center">
-          <div className="flex flex-col items-center justify-center ">
+        <div className="flex flex-1 flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center w-full">
             <div className="mt-3 flex flex-col items-center leading-none">
               <img src={logo} alt="Providus Bank" width={180} />
             </div>
@@ -110,13 +108,13 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
               />
               
                 {isLoading && (
-                  <span className="text-xs flex items-center gap-1.5 text-[#484848] mt-3">
+                  <span className="text-xs flex items-center gap-1.5 text-[#484848]">
                     <Loader2 size={15} className="animate-spin" /> Verifying
                     account...
                   </span>
                 )}
                 {!isLoading && accountName && (
-                  <span className="text-xs flex items-center gap-1.5 text-[#010101] mt-3">
+                  <span className="text-xs flex items-center gap-1.5 text-[#010101]">
                     <CircleCheck color="#039855" size={15} />
                     {accountName}
                   </span>
@@ -126,7 +124,7 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
                     <CircleAlert size={15} /> {errorMsg}
                   </span>
                 )}
-              
+             
               <Button
                 type="submit"
                 disabled={!canContinue}
