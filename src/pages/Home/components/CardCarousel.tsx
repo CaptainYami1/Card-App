@@ -11,7 +11,7 @@ type CardCarouselProps = {
 
 export const CardCarousel = ({ onOpenSecureWindow }: CardCarouselProps) => {
   const [active, setActive] = useState(0);
-  const [ setActiveCard] = useState<Card | null>(null);
+  const [, setActiveCard] = useState<Card | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const { data } = useGetCardsQuery(undefined);

@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import {api} from "./client"
 
-
 export const store = configureStore({
   reducer: {
     [api.reducerPath]: api.reducer,
