@@ -104,6 +104,7 @@ export const LandingPage = ({ onContinue }: LandingPageProps) => {
                 value={accountNumber}
                 type="number"
                 onChange={(e) => handleChange(e.target.value)}
+                
                 className="w-full"
               />
               

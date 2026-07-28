@@ -3,10 +3,10 @@ import { api } from "./client";
 export const appApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAccountName: builder.mutation({
-      query: (params) => ({
+      query: (body) => ({
         url: `accounts/validate`,
         method: "POST",
-        params,
+        body,
       }),
       invalidatesTags: ["Account"],
     }),

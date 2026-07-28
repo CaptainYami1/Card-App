@@ -12,6 +12,7 @@ type InputTextProps = {
   id?: string;
   type?: string;
   disabled?: boolean;
+  max?: number;
 };
 
 export const InputText = ({
@@ -23,6 +24,7 @@ export const InputText = ({
   readOnly = false,
   placeholder,
   name,
+  max,
   id,
   type = "text",
   disabled = false,
@@ -61,6 +63,7 @@ export const InputText = ({
         type={type}
         className="w-full rounded-[10px] border border-[#E9EAEB] bg-white p-4 font-sora text-[12px] placeholder:text-[#AAAAAA] text-[#242424] outline-none focus:border-[#242424]  disabled:cursor-not-allowed disabled:opacity-60 read-only:cursor-default"
         value={inputValue ?? ""}
+        max={max}
         onChange={readOnly ? undefined : handleChange}
         readOnly={readOnly}
         disabled={disabled}
