@@ -11,18 +11,18 @@ export const appApi = api.injectEndpoints({
       invalidatesTags: ["Account"],
     }),
     createSession: builder.mutation({
-      query: (params) => ({
+      query: (body) => ({
         url: `sessions`,
         method: "POST",
-        params,
+        body,
       }),
       invalidatesTags: ["CreateSession"],
     }),
     endSession: builder.mutation({
-      query: (params) => ({
-        url: `sessions`,
+      query: (body) => ({
+        url: `sessions/complete`,
         method: "POST",
-        params,
+        body,
       }),
       invalidatesTags: ["EndSession"],
     }),
