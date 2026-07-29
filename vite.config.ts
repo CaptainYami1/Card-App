@@ -6,7 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({mode})=>{
   const env = loadEnv(mode, process.cwd(), "");
   const apiBaseUrl = env.VITE_BASE_URL;
-  const { origin } = new URL(apiBaseUrl);
+  const { origin, pathname } = new URL(apiBaseUrl);
+  // Full API path prefix from VITE_BASE_URL, e.g. "/api/v1.2/web/card-control"
+  const basePath = pathname.replace(/\/$/, "");
   return{
   plugins: [react(), tailwindcss()],
   server: {
@@ -15,7 +17,7 @@ export default defineConfig(({mode})=>{
           target: origin,
           changeOrigin: true,
           secure: true,
-          rewrite: (path) => path.replace(/^\/api/, "/api/v1.2"),
+          rewrite: (path) => path.replace(/^\/api/, basePath),
         },
       },
     },

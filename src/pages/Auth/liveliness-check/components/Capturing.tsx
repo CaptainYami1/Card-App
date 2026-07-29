@@ -2,6 +2,7 @@ import { FaceLivenessDetector } from "@aws-amplify/ui-react-liveness";
 import "@aws-amplify/ui-react/styles.css";
 import type { Session } from "../types";
 import { useEndSessionMutation } from "../../../../service/appApi";
+import { awsRegion } from "../../../../aws-exports";
 import { ScanFace } from "lucide-react";
 
 type CapturingProps = {
@@ -17,7 +18,7 @@ type EndSessionResponse = {
   confidence?: number;
 };
 
-const region = import.meta.env.VITE_AWS_REGION ?? "us-east-1";
+const region = import.meta.env.VITE_AWS_REGION ?? awsRegion;
 
 export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => {
   const [endSession] = useEndSessionMutation();
@@ -28,7 +29,6 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
   const handleAnalysisComplete = async () => {
     try {
       const result = (await endSession({
-        sessionId: session?.sessionId,
         challengeId: session?.challengeId,
       }).unwrap()) as EndSessionResponse;
 
