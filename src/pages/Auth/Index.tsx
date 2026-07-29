@@ -5,7 +5,7 @@ import { LivelinessCheck } from "./liveliness-check/LivelinessCheck";
 import type { Session } from "./liveliness-check/types";
 
 export const Index = () => {
-  const [page, setPage] = useState("LivelinessCheck");
+  const [page, setPage] = useState("LandingPage");
   const [accountNumber, setAccountNumber] = useState("");
   const [session, setSession] = useState<Session | undefined>(undefined);
   return (
