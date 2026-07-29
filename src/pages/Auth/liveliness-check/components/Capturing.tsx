@@ -1,5 +1,5 @@
 import { FaceLivenessDetector } from "@aws-amplify/ui-react-liveness";
-import { ThemeProvider, type Theme } from "@aws-amplify/ui-react";
+import { Alert} from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import type { Session } from "../types";
 import { useEndSessionMutation } from "../../../../service/appApi";
@@ -20,30 +20,6 @@ type EndSessionResponse = {
 };
 
 const region = import.meta.env.VITE_AWS_REGION ?? awsRegion;
-
-// Brand the Amplify liveness UI so its buttons/accents match the app palette
-// (ink #30444F) instead of the default Amplify blue.
-const livenessTheme: Theme = {
-  name: "providus-liveness",
-  tokens: {
-    colors: {
-      brand: {
-        primary: {
-          10: { value: "#30444F1A" },
-          20: { value: "#30444F33" },
-          80: { value: "#30444F" },
-          90: { value: "#2b3d47" },
-          100: { value: "#26363f" },
-        },
-      },
-    },
-    radii: {
-      small: { value: "12px" },
-      medium: { value: "16px" },
-      large: { value: "9999px" },
-    },
-  },
-};
 
 export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => {
   const [endSession] = useEndSessionMutation();
@@ -86,22 +62,35 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
         </p>
       </div>
 
-      <div className="mt-6 flex flex-col overflow-hidden rounded-2xl">
+      <div className="mt-8 flex flex-col overflow-hidden rounded-2xl">
         {session?.sessionId ? (
-          <ThemeProvider theme={livenessTheme}>
-            <FaceLivenessDetector
-              sessionId={session.sessionId}
-              region={region}
-              onAnalysisComplete={handleAnalysisComplete}
-              onError={(livenessError) => {
-                console.error({
-                  state: livenessError.state,
-                  error: livenessError.error,
-                });
-                onFailure?.();
-              }}
-            />
-          </ThemeProvider>
+          <FaceLivenessDetector
+            sessionId={session.sessionId}
+            region={region}
+            onAnalysisComplete={handleAnalysisComplete}
+            components={{
+              PhotosensitiveWarning: (): React.JSX.Element => {
+                return (
+                  <Alert
+                    variation="warning"
+                    isDismissible={false}
+                    hasIcon={true}
+                    heading="Caution"
+                  >
+                    This check displays colored lights. Use caution if you are
+                    photosensitive.
+                  </Alert>
+                );
+              },
+            }}
+            onError={(livenessError) => {
+              console.error({
+                state: livenessError.state,
+                error: livenessError.error,
+              });
+              onFailure?.();
+            }}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center">
             <div className="flex h-67.5 w-67.5 items-center justify-center overflow-hidden rounded-full border border-[#E9EAEB] bg-slate-100">
