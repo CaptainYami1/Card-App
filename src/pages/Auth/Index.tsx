@@ -5,7 +5,7 @@ import { LivelinessCheck } from "./liveliness-check/LivelinessCheck";
 import type { Session } from "./liveliness-check/types";
 
 export const Index = () => {
-  const [page, setPage] = useState("LandingPage");
+  const [page, setPage] = useState("LivelinessCheck");
   const [accountNumber, setAccountNumber] = useState("");
   const [session, setSession] = useState<Session | undefined>(undefined);
   return (
@@ -18,6 +18,7 @@ export const Index = () => {
           }}
         />
       )}
+      
       {page === "VerifyIdentity" && (
         <VerifyIdentity
           accountNumber={accountNumber}
@@ -31,6 +32,7 @@ export const Index = () => {
       {page === "LivelinessCheck" && (
         <LivelinessCheck
           session={session}
+          accountNumber={accountNumber}
           onBack={() => setPage("VerifyIdentity")}
           onCancel={() => setPage("LandingPage")}
         />

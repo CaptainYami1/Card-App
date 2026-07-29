@@ -1,4 +1,5 @@
 import { FaceLivenessDetector } from "@aws-amplify/ui-react-liveness";
+import { ThemeProvider, type Theme } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import type { Session } from "../types";
 import { useEndSessionMutation } from "../../../../service/appApi";
@@ -19,6 +20,30 @@ type EndSessionResponse = {
 };
 
 const region = import.meta.env.VITE_AWS_REGION ?? awsRegion;
+
+// Brand the Amplify liveness UI so its buttons/accents match the app palette
+// (ink #30444F) instead of the default Amplify blue.
+const livenessTheme: Theme = {
+  name: "providus-liveness",
+  tokens: {
+    colors: {
+      brand: {
+        primary: {
+          10: { value: "#30444F1A" },
+          20: { value: "#30444F33" },
+          80: { value: "#30444F" },
+          90: { value: "#2b3d47" },
+          100: { value: "#26363f" },
+        },
+      },
+    },
+    radii: {
+      small: { value: "12px" },
+      medium: { value: "16px" },
+      large: { value: "9999px" },
+    },
+  },
+};
 
 export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => {
   const [endSession] = useEndSessionMutation();
@@ -51,7 +76,7 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
   };
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col min-h-0 overflow-y-auto">
       <div className="mt-4 text-center">
         <h1 className="text-lg font-semibold text-ink">Verify Your Identity</h1>
         <p className="mt-2.5 text-[13px] leading-5 text-[#484848]">
@@ -61,20 +86,22 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col overflow-hidden rounded-2xl">
+      <div className="mt-6 flex flex-col overflow-hidden rounded-2xl">
         {session?.sessionId ? (
-          <FaceLivenessDetector
-            sessionId={session.sessionId}
-            region={region}
-            onAnalysisComplete={handleAnalysisComplete}
-            onError={(livenessError) => {
-              console.error({
-                state: livenessError.state,
-                error: livenessError.error,
-              });
-              onFailure?.();
-            }}
-          />
+          <ThemeProvider theme={livenessTheme}>
+            <FaceLivenessDetector
+              sessionId={session.sessionId}
+              region={region}
+              onAnalysisComplete={handleAnalysisComplete}
+              onError={(livenessError) => {
+                console.error({
+                  state: livenessError.state,
+                  error: livenessError.error,
+                });
+                onFailure?.();
+              }}
+            />
+          </ThemeProvider>
         ) : (
           <div className="flex flex-col items-center justify-center">
             <div className="flex h-67.5 w-67.5 items-center justify-center overflow-hidden rounded-full border border-[#E9EAEB] bg-slate-100">

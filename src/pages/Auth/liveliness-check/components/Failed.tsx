@@ -1,9 +1,17 @@
-import { Glasses, ScanFace, Sun, X } from "lucide-react";
+import { Glasses, Loader2, ScanFace, Sun, X } from "lucide-react";
 import { Button } from "../../../../components/Button";
 import type { ReactNode } from "react";
 
 
-export const Failed = ({ onRetry, onCancel }: { onRetry: () => void; onCancel: () => void }) => {
+export const Failed = ({
+  onRetry,
+  onCancel,
+  loading = false,
+}: {
+  onRetry: () => void;
+  onCancel: () => void;
+  loading?: boolean;
+}) => {
    
 
  return (
@@ -28,13 +36,21 @@ export const Failed = ({ onRetry, onCancel }: { onRetry: () => void; onCancel: (
       </div>
 
       <div className="mt-5 flex flex-col gap-3">
-        <Button variant="primary" onClick={onRetry}>
-          Try Again
+        <Button variant="primary" onClick={onRetry} disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Starting again...
+            </>
+          ) : (
+            "Try Again"
+          )}
         </Button>
         <Button
           type="button"
           onClick={onCancel}
           variant="ghost"
+          disabled={loading}
         >
           Cancel
         </Button>
