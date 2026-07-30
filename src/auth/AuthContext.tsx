@@ -8,6 +8,7 @@ import {
 } from "react";
 
 export const STORAGE_KEY = "pcc_auth";
+export const VERIFICATION_ID_KEY = "pcc_verification_id";
 
 type AuthContextValue = {
   isAuthenticated: boolean;

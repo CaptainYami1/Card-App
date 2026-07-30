@@ -1,4 +1,7 @@
 import { api } from "./client";
+import type { Card } from "../pages/Home/types";
+
+type GetCardsResponse = Card[] | { cards?: Card[]; data?: Card[] };
 
 export const appApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -26,11 +29,13 @@ export const appApi = api.injectEndpoints({
       }),
       invalidatesTags: ["EndSession"],
     }),
-    getCards: builder.query({
-      query: (params) => ({
+    getCards: builder.query<GetCardsResponse, string | undefined>({
+      query: (verificationId) => ({
         url: `cards`,
         method: "GET",
-        params,
+        headers: verificationId
+          ? { "X-Verification-Id": verificationId }
+          : undefined,
       }),
       providesTags: ["Cards"],
     }),

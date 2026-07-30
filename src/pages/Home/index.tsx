@@ -5,6 +5,8 @@ import { Confirmation } from "./components/Confirmation";
 import { Closed } from "./components/Closed";
 import { NoCards } from "./components/NoCards";
 import type { Card } from "./types";
+import { useGetCardsQuery } from "../../service/appApi";
+import { VERIFICATION_ID_KEY } from "../../auth/AuthContext";
 
 type Screen = "cards" | "secureWindow" | "confirmation" | "closed" | "noCards";
 
@@ -14,11 +16,22 @@ export const Home = () => {
   const [screen, setScreen] = useState<Screen>("cards");
   const [duration, setDuration] = useState(5);
   const [selectedCard, setSelectedCard] = useState<Card>(emptyCard);
+  const verificationId =
+    sessionStorage.getItem(VERIFICATION_ID_KEY) ?? undefined;
+  const { data } = useGetCardsQuery(verificationId);
 
+  const cards = Array.isArray(data)
+    ? data
+    : (data?.cards ?? data?.data ?? []);
+
+  // Derive the screen instead of syncing it via an effect: once the cards have
+  // loaded and the account has none, always show NoCards. Otherwise fall back
+  // to the user-navigable screen state.
+  const activeScreen: Screen = data && cards.length === 0 ? "noCards" : screen;
 
   return (
     <>
-      {screen === "cards" && (
+      {activeScreen === "cards" && (
         <CardCarousel
           onOpenSecureWindow={(card) => {
             setSelectedCard(card);
@@ -27,7 +40,7 @@ export const Home = () => {
         />
       )}
 
-      {screen === "secureWindow" && (
+      {activeScreen === "secureWindow" && (
         <SecureWindow
           card={selectedCard}
           duration={duration}
@@ -37,7 +50,7 @@ export const Home = () => {
         />
       )}
 
-      {screen === "confirmation" && (
+      {activeScreen === "confirmation" && (
         <Confirmation
           cardId={selectedCard.id}
           durationMinutes={duration}
@@ -48,7 +61,7 @@ export const Home = () => {
         />
       )}
 
-      {screen === "closed" && (
+      {activeScreen === "closed" && (
         <Closed
           onBack={() => setScreen("cards")}
           onDone={() => setScreen("cards")}
@@ -56,7 +69,7 @@ export const Home = () => {
         />
       )}
 
-      {screen === "noCards" && <NoCards />}
+      {activeScreen === "noCards" && <NoCards />}
     </>
   );
 };

@@ -4,6 +4,7 @@ import { Button } from "../../../components/Button";
 import { BankCard } from "./BankCard";
 import type { Card } from "../types";
 import { useGetCardsQuery } from "../../../service/appApi";
+import { VERIFICATION_ID_KEY } from "../../../auth/AuthContext";
 
 type CardCarouselProps = {
   onOpenSecureWindow: (card: Card) => void;
@@ -14,7 +15,8 @@ export const CardCarousel = ({ onOpenSecureWindow }: CardCarouselProps) => {
   const [, setActiveCard] = useState<Card | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const { data } = useGetCardsQuery(undefined);
+  const verificationId = sessionStorage.getItem(VERIFICATION_ID_KEY) ?? undefined;
+  const { data } = useGetCardsQuery(verificationId);
   const cards: Card[] = Array.isArray(data)
     ? data
     : (data?.cards ?? data?.data ?? []);

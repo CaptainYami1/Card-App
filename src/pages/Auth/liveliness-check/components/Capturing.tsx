@@ -3,6 +3,7 @@ import { Alert} from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import type { Session } from "../types";
 import { useEndSessionMutation } from "../../../../service/appApi";
+import { VERIFICATION_ID_KEY } from "../../../../auth/AuthContext";
 import { awsRegion } from "../../../../aws-exports";
 import { ScanFace } from "lucide-react";
 
@@ -34,6 +35,9 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
       // A successful completion returns a verificationId. Liveness failures come
       // back as an error response (handled in catch).
       if (result?.verificationId) {
+        // Persist it so the protected getCards request can send it via the
+        // X-Verification-Id header (the Home page is on a separate route).
+        sessionStorage.setItem(VERIFICATION_ID_KEY, result.verificationId);
         onSuccess?.();
       } else {
         onFailure?.();
