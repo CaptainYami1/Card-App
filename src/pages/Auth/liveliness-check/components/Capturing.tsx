@@ -13,10 +13,8 @@ type CapturingProps = {
 };
 
 type EndSessionResponse = {
-  isLive?: boolean;
-  success?: boolean;
-  status?: string;
-  confidence?: number;
+  verificationId: string;
+  expiresAt: string;
 };
 
 const region = import.meta.env.VITE_AWS_REGION ?? awsRegion;
@@ -33,15 +31,9 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
         challengeId: session?.challengeId,
       }).unwrap()) as EndSessionResponse;
 
-      const passed =
-        result.isLive ??
-        result.success ??
-        (result.status
-          ? result.status.toUpperCase() === "SUCCEEDED"
-          : undefined) ??
-        false;
-
-      if (passed) {
+      // A successful completion returns a verificationId. Liveness failures come
+      // back as an error response (handled in catch).
+      if (result?.verificationId) {
         onSuccess?.();
       } else {
         onFailure?.();
@@ -68,6 +60,7 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
             sessionId={session.sessionId}
             region={region}
             onAnalysisComplete={handleAnalysisComplete}
+            disableStartScreen={true}
             components={{
               PhotosensitiveWarning: (): React.JSX.Element => {
                 return (

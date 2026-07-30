@@ -11,7 +11,7 @@ type Screen = "cards" | "secureWindow" | "confirmation" | "closed" | "noCards";
 const emptyCard: Card = { id: "", maskedPan: "", expiry: "" };
 
 export const Home = () => {
-  const [screen, setScreen] = useState<Screen>("noCards");
+  const [screen, setScreen] = useState<Screen>("cards");
   const [duration, setDuration] = useState(5);
   const [selectedCard, setSelectedCard] = useState<Card>(emptyCard);
 
