@@ -3,6 +3,14 @@ import type { Card } from "../pages/Home/types";
 
 type GetCardsResponse = Card[] | { cards?: Card[]; data?: Card[] };
 
+type OpenCardWindowResponse = { activeWindowExpiresAt: string | null };
+
+type OpenCardWindowArgs = {
+  cardId: string;
+  durationSeconds: number;
+  verificationId?: string;
+};
+
 export const appApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAccountName: builder.mutation({
@@ -39,18 +47,24 @@ export const appApi = api.injectEndpoints({
       }),
       providesTags: ["Cards"],
     }),
-    openCardWindow: builder.mutation({
-      query: ({ cardId, durationSeconds }) => ({
+    openCardWindow: builder.mutation<OpenCardWindowResponse, OpenCardWindowArgs>({
+      query: ({ cardId, durationSeconds, verificationId }) => ({
         url: `cards/${cardId}/window/open`,
         method: "POST",
         body: { durationSeconds },
+        headers: verificationId
+          ? { "X-Verification-Id": verificationId }
+          : undefined,
       }),
       invalidatesTags: ["OpenCard"],
     }),
     closeCardWindow: builder.mutation({
-      query: (cardId) => ({
+      query: ({ cardId, verificationId }) => ({
         url: `cards/${cardId}/window/close`,
         method: "POST",
+        headers: verificationId
+          ? { "X-Verification-Id": verificationId }
+          : undefined,
       }),
       invalidatesTags: ["CloseCard"],
     }),

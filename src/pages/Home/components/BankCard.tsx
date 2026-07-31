@@ -3,18 +3,31 @@ import card from "../../../assets/card.png";
 type BankCardProps = {
   number?: string;
   validThrough?: string;
+  imageBytes?: string;
+  imageContentType?: string;
   className?: string;
 };
 
 export const BankCard = ({
   number,
   validThrough,
+  imageBytes,
+  imageContentType,
   className = "",
 }: BankCardProps) => {
+  const artwork =
+    imageBytes && imageContentType
+      ? `data:${imageContentType};base64,${imageBytes}`
+      : card;
+
   return (
     <div className={`relative w-full ${className}`}>
       {/* Full card artwork — sizes the container to the image so nothing is cropped */}
-      <img src={card} alt="Providus card" className="block w-full rounded-2xl" />
+      <img
+        src={artwork}
+        alt="Providus card"
+        className="block w-full rounded-2xl"
+      />
 
       {/* Dynamic overlays */}
       <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">

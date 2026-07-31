@@ -1,75 +1,84 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CardCarousel } from "./components/CardCarousel";
 import { SecureWindow } from "./components/SecureWindow";
 import { Confirmation } from "./components/Confirmation";
 import { Closed } from "./components/Closed";
-import { NoCards } from "./components/NoCards";
 import type { Card } from "./types";
-import { useGetCardsQuery } from "../../service/appApi";
-import { VERIFICATION_ID_KEY } from "../../auth/AuthContext";
+import { getRemainingSeconds } from "./activeWindow";
 
 type Screen = "cards" | "secureWindow" | "confirmation" | "closed" | "noCards";
 
 const emptyCard: Card = { id: "", maskedPan: "", expiry: "" };
 
 export const Home = () => {
+  const navigate = useNavigate();
   const [screen, setScreen] = useState<Screen>("cards");
   const [duration, setDuration] = useState(5);
   const [selectedCard, setSelectedCard] = useState<Card>(emptyCard);
-  const verificationId =
-    sessionStorage.getItem(VERIFICATION_ID_KEY) ?? undefined;
-  const { data } = useGetCardsQuery(verificationId);
+  const [activeExpiresAt, setActiveExpiresAt] = useState<string | null>(null);
 
-  const cards = Array.isArray(data)
-    ? data
-    : (data?.cards ?? data?.data ?? []);
+  // Route into the Confirmation screen for a card whose window is already open.
+  const resumeActiveWindow = (card: Card, expiresAt: string) => {
+    setSelectedCard(card);
+    setActiveExpiresAt(expiresAt);
+    setDuration(Math.max(1, Math.ceil(getRemainingSeconds(expiresAt) / 60)));
+    setScreen("confirmation");
+  };
 
-  // Derive the screen instead of syncing it via an effect: once the cards have
-  // loaded and the account has none, always show NoCards. Otherwise fall back
-  // to the user-navigable screen state.
-  const activeScreen: Screen = data && cards.length === 0 ? "noCards" : screen;
+  // End the session: wipe all stored state and return to verification.
+  const handleDone = () => {
+    sessionStorage.clear();
+    navigate("/verification");
+  };
 
   return (
     <>
-      {activeScreen === "cards" && (
+      {screen === "cards" && (
         <CardCarousel
           onOpenSecureWindow={(card) => {
             setSelectedCard(card);
             setScreen("secureWindow");
           }}
+          onResumeActiveWindow={resumeActiveWindow}
         />
       )}
 
-      {activeScreen === "secureWindow" && (
+      {screen === "secureWindow" && (
         <SecureWindow
           card={selectedCard}
           duration={duration}
           onDurationChange={setDuration}
           onBack={() => setScreen("cards")}
-          onConfirm={() => setScreen("confirmation")}
+          onConfirm={(expiresAt) => {
+            setActiveExpiresAt(expiresAt);
+            setScreen("confirmation");
+          }}
         />
       )}
 
-      {activeScreen === "confirmation" && (
+      {screen === "confirmation" && (
         <Confirmation
           cardId={selectedCard.id}
           durationMinutes={duration}
+          expiresAt={activeExpiresAt ?? undefined}
           cardLast4={selectedCard.maskedPan.replace(/\s/g, "").slice(-4)}
           expires={selectedCard.expiry}
           onBack={() => setScreen("secureWindow")}
-          onClose={() => setScreen("closed")}
+          onClose={() => {
+            setActiveExpiresAt(null);
+            setScreen("closed");
+          }}
         />
       )}
 
-      {activeScreen === "closed" && (
+      {screen === "closed" && (
         <Closed
           onBack={() => setScreen("cards")}
-          onDone={() => setScreen("cards")}
-          onOpenAgain={() => setScreen("secureWindow")}
+          onDone={handleDone}
+          onOpenAgain={() => setScreen("cards")}
         />
       )}
-
-      {activeScreen === "noCards" && <NoCards />}
     </>
   );
 };

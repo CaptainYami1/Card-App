@@ -3,6 +3,8 @@ import { Button } from "../../../components/Button";
 import { BankCard } from "./BankCard";
 import type { Card } from "../types";
 import { useOpenCardWindowMutation } from "../../../service/appApi";
+import { VERIFICATION_ID_KEY } from "../../../auth/AuthContext";
+import { saveActiveWindow } from "../activeWindow";
 
 const popularOptions = [5, 10, 30, 60];
 
@@ -11,7 +13,7 @@ type SecureWindowProps = {
   duration: number;
   onDurationChange: (minutes: number) => void;
   onBack: () => void;
-  onConfirm: () => void;
+  onConfirm: (expiresAt: string) => void;
 };
 
 export const SecureWindow = ({
@@ -25,11 +27,17 @@ export const SecureWindow = ({
 
   const handleConfirm = async () => {
     try {
-      await openCardWindow({
+      const verificationId =
+        sessionStorage.getItem(VERIFICATION_ID_KEY) ?? undefined;
+      const { activeWindowExpiresAt } = await openCardWindow({
         cardId: card.id,
         durationSeconds: duration * 60,
+        verificationId,
       }).unwrap();
-      onConfirm();
+      if (activeWindowExpiresAt) {
+        saveActiveWindow(card.id, activeWindowExpiresAt);
+        onConfirm(activeWindowExpiresAt);
+      }
     } catch (error) {
       console.error("Failed to open card window", error);
     }

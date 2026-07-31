@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, LockOpen } from "lucide-react";
 import { Button } from "../../../components/Button";
 import { useCloseCardWindowMutation } from "../../../service/appApi";
+import { VERIFICATION_ID_KEY } from "../../../auth/AuthContext";
+import { clearActiveWindow, getRemainingSeconds } from "../activeWindow";
 
 type ConfirmationProps = {
   cardId: string;
   durationMinutes: number;
+  expiresAt?: string;
   cardLast4?: string;
   expires?: string;
   onBack: () => void;
@@ -19,22 +22,27 @@ function pad(n: number) {
 export const Confirmation = ({
   cardId,
   durationMinutes,
+  expiresAt,
   cardLast4 = "4431",
   expires = "12/28",
   onBack,
   onClose,
 }: ConfirmationProps) => {
-  const totalSeconds = durationMinutes * 60;
-  const [remaining, setRemaining] = useState(totalSeconds);
+  const [remaining, setRemaining] = useState(() =>
+    expiresAt ? getRemainingSeconds(expiresAt) : durationMinutes * 60
+  );
   const [closeCardWindow, { isLoading: isClosing }] =
     useCloseCardWindowMutation();
 
   const handleClose = async () => {
     try {
-      await closeCardWindow(cardId).unwrap();
+      const verificationId =
+        sessionStorage.getItem(VERIFICATION_ID_KEY) ?? undefined;
+      await closeCardWindow({ cardId, verificationId }).unwrap();
     } catch (error) {
       console.error("Failed to close card window", error);
     } finally {
+      clearActiveWindow();
       onClose();
     }
   };
@@ -42,12 +50,17 @@ export const Confirmation = ({
   useEffect(() => {
     if (remaining <= 0) {
       // Window expired — auto-close.
+      clearActiveWindow();
       onClose();
       return;
     }
-    const timer = setInterval(() => setRemaining((s) => s - 1), 1000);
+    // When we have an absolute expiry, recompute from it each tick so the
+    // countdown stays accurate even if the tab was backgrounded.
+    const timer = setInterval(() => {
+      setRemaining((s) => (expiresAt ? getRemainingSeconds(expiresAt) : s - 1));
+    }, 1000);
     return () => clearInterval(timer);
-  }, [remaining, onClose]);
+  }, [remaining, expiresAt, onClose]);
 
   const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
