@@ -32,8 +32,7 @@ export const CardCarousel = ({
     [data]
   );
 
-  // If any card already has an open, unexpired window, jump straight to its
-  // Confirmation screen so a second card cannot be opened until it times out.
+ 
   const resumedRef = useRef(false);
   useEffect(() => {
     if (resumedRef.current || cards.length === 0) return;
@@ -77,12 +76,12 @@ export const CardCarousel = ({
     <div className="flex flex-1 flex-col px-6 py-8 ">
       {isLoading && (
         <div className="flex flex-1 flex-col items-center justify-center ">
-          <LoaderCircle color="#30444F" />
+          <LoaderCircle className="animate-spin" color="#30444F" />
           <p className="">Loading cards</p>
         </div>
       )}
       {!isLoading && (
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-1 flex-col gap-10">
           {/* Heading */}
           <div>
             <h1 className="text-xl font-semibold text-ink">Your Cards</h1>
@@ -93,6 +92,8 @@ export const CardCarousel = ({
 
           {cards.length > 0 && (
             <>
+            <div className="flex flex-col justify-between  flex-1">
+            <div className="">
               <div className="flex flex-1 flex-col justify-center">
                 <div
                   ref={trackRef}
@@ -132,7 +133,7 @@ export const CardCarousel = ({
                 </div>
               </div>
 
-              <div className="mt-auto flex flex-col items-center gap-5">
+              <div className=" flex flex-col items-center gap-5 mt-3">
                 <Button
                   variant="primary"
                   onClick={() => handleOpen(cards[active])}
@@ -140,14 +141,17 @@ export const CardCarousel = ({
                   Open Secure Window
                 </Button>
               </div>
-              <div className=" flex justify-center -mt-4">
+              </div>
+              <div className=" flex justify-center">
                 <button
                   type="button"
                   className="flex items-center gap-1.5 text-xs text-ink-500 transition hover:opacity-70"
+                  onClick={() => setShowSupport(true)}
                 >
                   <HelpCircle size={14} />
                   Need Help?
                 </button>
+              </div>
               </div>
             </>
           )}
@@ -193,13 +197,14 @@ export const CardCarousel = ({
                 </div>
               </div>
 
-              {showSupport && (
-                <ContactSupport onClose={() => setShowSupport(false)} />
-              )}
+              
             </div>
           )}
         </div>
       )}
+      {showSupport && (
+                <ContactSupport onClose={() => setShowSupport(false)} />
+              )}
     </div>
   );
 };
