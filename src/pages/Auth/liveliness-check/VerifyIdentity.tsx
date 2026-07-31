@@ -40,7 +40,7 @@ export const VerifyIdentity = ({
       onContinue?.(session);
     } catch {
       setErrorMsg(
-        "We couldn't start your verification session. Please try again."
+        "We couldn't start your verification session. Please try again later."
       );
     }
   }
