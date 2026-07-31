@@ -31,20 +31,13 @@ const isDesktop =
 export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => {
   const [endSession] = useEndSessionMutation();
 
-  // const sessionsessionId = "123"
-  // Fired once the video stream has been fully sent to Rekognition. The liveness
-  // result is finalized/retrieved from our backend via the endSession endpoint.
   const handleAnalysisComplete = async () => {
     try {
       const result = (await endSession({
         challengeId: session?.challengeId,
       }).unwrap()) as EndSessionResponse;
 
-      // A successful completion returns a verificationId. Liveness failures come
-      // back as an error response (handled in catch).
       if (result?.verificationId) {
-        // Persist it so the protected getCards request can send it via the
-        // X-Verification-Id header (the Home page is on a separate route).
         sessionStorage.setItem(VERIFICATION_ID_KEY, result.verificationId);
         onSuccess?.();
       } else {
@@ -57,16 +50,16 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
 
   return (
     <div className="flex flex-1 flex-col min-h-0 overflow-y-auto">
-      <div className="mt-4 text-center">
+      {/* <div className="mt-4 text-center">
         <h1 className="text-lg font-semibold text-ink">Verify Your Identity</h1>
         <p className="mt-2.5 text-[13px] leading-5 text-[#484848]">
           We need to confirm it&apos;s you.
           <br />
           Position your face in the frame
         </p>
-      </div>
+      </div> */}
 
-      <div className="mt-8 flex min-h-125 flex-1 flex-col overflow-hidden rounded-2xl">
+      <div className="mt-4 flex min-h-125 flex-1 flex-col overflow-hidden rounded-2xl">
         {session?.sessionId ? (
           <FaceLivenessDetector
             sessionId={session.sessionId}
