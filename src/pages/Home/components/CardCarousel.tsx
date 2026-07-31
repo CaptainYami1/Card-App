@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HelpCircle, LoaderCircle, Search, Wallet } from "lucide-react";
 import { Button } from "../../../components/Button";
 import { BankCard } from "./BankCard";
@@ -27,9 +27,10 @@ export const CardCarousel = ({
   const verificationId =
     sessionStorage.getItem(VERIFICATION_ID_KEY) ?? undefined;
   const { data, isLoading } = useGetCardsQuery(verificationId);
-  const cards: Card[] = Array.isArray(data)
-    ? data
-    : (data?.cards ?? data?.data ?? []);
+  const cards: Card[] = useMemo(
+    () => (Array.isArray(data) ? data : (data?.cards ?? data?.data ?? [])),
+    [data]
+  );
 
   // If any card already has an open, unexpired window, jump straight to its
   // Confirmation screen so a second card cannot be opened until it times out.

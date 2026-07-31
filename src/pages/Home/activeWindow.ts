@@ -36,8 +36,6 @@ export function clearActiveWindow(): void {
   sessionStorage.removeItem(ACTIVE_WINDOW_KEY);
 }
 
-// Returns the stored active window only if it exists and has not expired.
-// Expired entries are cleared as a side effect.
 export function getActiveWindow(): ActiveWindow | null {
   const raw = sessionStorage.getItem(ACTIVE_WINDOW_KEY);
   if (!raw) return null;
