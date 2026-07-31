@@ -28,7 +28,7 @@ export const ContactSupport = ({
     <div className="absolute inset-0 z-50 flex items-center justify-center px-6">
       {/* Scrim */}
       <div
-        className="absolute inset-0 bg-ink/40"
+        className="absolute inset-0 bg-ink/40 top-0 bottom-0 left-0 right-0"
         onClick={onClose}
         aria-hidden="true"
       />
