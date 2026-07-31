@@ -20,6 +20,14 @@ type EndSessionResponse = {
 
 const region = import.meta.env.VITE_AWS_REGION ?? awsRegion;
 
+// Desktops (mouse/trackpad) have a fixed webcam and a centered face, so skipping
+// the "Get Ready" screen is fine. On touch devices the user is holding the phone
+// and needs the start screen to get into position — otherwise the oval-fit
+// challenge starts before they're ready and the check fails repeatedly.
+const isDesktop =
+  typeof window !== "undefined" &&
+  window.matchMedia?.("(pointer: fine)").matches;
+
 export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => {
   const [endSession] = useEndSessionMutation();
 
@@ -58,13 +66,13 @@ export const Capturing = ({ session, onSuccess, onFailure }: CapturingProps) => 
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col overflow-hidden rounded-2xl">
+      <div className="mt-8 flex min-h-125 flex-1 flex-col overflow-hidden rounded-2xl">
         {session?.sessionId ? (
           <FaceLivenessDetector
             sessionId={session.sessionId}
             region={region}
             onAnalysisComplete={handleAnalysisComplete}
-            disableStartScreen={true}
+            disableStartScreen={isDesktop}
             components={{
               PhotosensitiveWarning: (): React.JSX.Element => {
                 return (
